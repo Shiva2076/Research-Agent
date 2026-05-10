@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     MINIO_BUCKET: str = "research-agent"
     MINIO_LICENSE: str | None = None
 
+    CLOUDINARY_CLOUD_NAME: str | None = None
+    CLOUDINARY_API_KEY: str | None = None
+    CLOUDINARY_API_SECRET: str | None = None
+
     GROQ_MODELS: dict = {
         "planner":   "llama-3.3-70b-versatile",
         "searcher":  "llama-3.1-8b-instant",

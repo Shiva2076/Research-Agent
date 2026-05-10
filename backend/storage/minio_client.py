@@ -24,15 +24,19 @@ async def ensure_bucket():
         logging.warning(f"MinIO bucket check failed: {e}")
 
 async def upload_file(key: str, data: bytes, content_type: str) -> str:
-    await ensure_bucket()
-    client = get_client()
-    client.put_object(
-        Bucket=settings.MINIO_BUCKET,
-        Key=key,
-        Body=data,
-        ContentType=content_type
-    )
-    return f"{settings.MINIO_ENDPOINT}/{settings.MINIO_BUCKET}/{key}"
+    try:
+        await ensure_bucket()
+        client = get_client()
+        client.put_object(
+            Bucket=settings.MINIO_BUCKET,
+            Key=key,
+            Body=data,
+            ContentType=content_type
+        )
+        return f"{settings.MINIO_ENDPOINT}/{settings.MINIO_BUCKET}/{key}"
+    except Exception as e:
+        logging.error(f"Failed to upload to MinIO: {e}")
+        return "#storage-not-configured"
 
 async def get_presigned_url(key: str, expires: int = 3600) -> str:
     client = get_client()

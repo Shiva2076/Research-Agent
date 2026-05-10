@@ -8,7 +8,7 @@ from db.sessions import create_session, update_agent, complete_session, fail_ses
 from cache.valkey import cache_agent_output
 from export.pdf_generator import generate_pdf
 from export.docx_generator import generate_docx
-from storage.minio_client import upload_file, get_presigned_url
+from storage.cloudinary_client import upload_file, get_presigned_url
 import uuid
 import json
 import time
@@ -125,8 +125,7 @@ async def export_report(request: ExportRequest):
         raise HTTPException(status_code=400, detail="Format must be pdf or docx")
 
     key = f"exports/{request.session_id}.{ext}"
-    await upload_file(key, data, content_type)
-    url = await get_presigned_url(key)
+    url = await upload_file(key, data, content_type)
 
     return {"url": url, "format": fmt, "session_id": request.session_id}
 
