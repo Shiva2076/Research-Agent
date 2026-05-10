@@ -7,7 +7,14 @@ _client = None
 def get_client():
     global _client
     if not _client:
-        _client = redis.from_url(settings.VALKEY_URL, encoding="utf-8", decode_responses=True)
+        # For Upstash/Production Redis, handle SSL if URL starts with rediss://
+        is_ssl = settings.VALKEY_URL.startswith("rediss://")
+        _client = redis.from_url(
+            settings.VALKEY_URL, 
+            encoding="utf-8", 
+            decode_responses=True,
+            ssl_cert_reqs=None if is_ssl else "required"
+        )
     return _client
 
 async def cache_set(key: str, value: any, ttl: int = 3600):
