@@ -12,7 +12,7 @@ export function SourcesList({ sourcesText }: Props) {
       {sources.map((src, i) => {
         const titleMatch = src.match(/Title:\s*(.+)/)
         const urlMatch = src.match(/URL:\s*(\S+)/)
-        const snippetMatch = src.match(/Snippet:\s*(.+)/s)
+        const snippetMatch = src.match(/Snippet:\s*([\s\S]+)/)
         const relevanceMatch = src.match(/Relevance:\s*(\w+)/)
 
         return (
