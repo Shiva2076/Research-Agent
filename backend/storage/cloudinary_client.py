@@ -19,7 +19,7 @@ async def upload_file(key: str, data: bytes, content_type: str) -> str:
         result = cloudinary.uploader.upload(
             data,
             public_id=key.replace("/", "_"),
-            resource_type="raw"
+            resource_type="auto"
         )
         return result.get("secure_url")
     except Exception as e:
