@@ -36,6 +36,5 @@ yarn-error.log*
 *.swo
 
 # Project specific
-backend/cache/
 backend/storage/exports/
 backend/storage/uploads/
