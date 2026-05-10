@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0D0F14;
+  --bg2: #13151C;
+  --bg3: #1A1D26;
+  --border: rgba(255,255,255,0.07);
+  --purple: #7262E8;
+  --teal: #1D9E75;
+  --teal-light: #5DCAA5;
+  --amber: #EF9F27;
+  --red: #E24B4A;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: #E0DDFF; font-family: 'DM Sans', sans-serif; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.pulse { animation: pulse-dot 1.2s ease-in-out infinite; }

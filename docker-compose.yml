@@ -1,0 +1,98 @@
+version: "3.9"
+
+services:
+  valkey:
+    image: valkey/valkey:7.2-alpine
+    container_name: research_valkey
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+    command: valkey-server --appendonly yes
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7
+    container_name: research_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: research_agent
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    container_name: research_minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: research_minio_init
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set local http://minio:9000 minioadmin minioadmin123;
+      mc mb --ignore-existing local/research-agent;
+      mc anonymous set download local/research-agent/exports;
+      exit 0;
+      "
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: research_backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - valkey
+      - mongodb
+      - minio
+    env_file:
+      - ./backend/.env
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+      - VALKEY_URL=redis://valkey:6379
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: research_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    env_file:
+      - ./frontend/.env.local
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+
+volumes:
+  valkey_data:
+  mongo_data:
+  minio_data:
